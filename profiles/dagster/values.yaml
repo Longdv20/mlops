@@ -1,0 +1,548 @@
+COMPUTED VALUES:
+additionalInstanceConfig: {}
+busybox:
+  image:
+    pullPolicy: IfNotPresent
+    repository: docker.io/busybox
+    tag: "1.28"
+computeLogManager:
+  config: {}
+  type: NoOpComputeLogManager
+dagster-user-deployments:
+  celeryConfigSecretName: dagster-celery-config-secret
+  dagsterHome: /opt/dagster/dagster_home
+  deployments:
+  - dagsterApiGrpcArgs:
+    - --python-file
+    - /app/dagster_pipeline.py
+    image:
+      pullPolicy: Always
+      repository: vietlong1220/dagster-pipeline
+      tag: latest
+    name: k8s-example-user-code-1
+    port: 3030
+  - dagsterApiGrpcArgs:
+    - --python-file
+    - /app/knn_flow.py
+    image:
+      pullPolicy: Always
+      repository: vietlong1220/knn_flow
+      tag: latest
+    name: k8s-example-knn-flow
+    port: 3030
+  - dagsterApiGrpcArgs:
+    - --python-file
+    - /app/supervised_learning_flow.py
+    image:
+      pullPolicy: Always
+      repository: vietlong1220/supervised_learning_flow
+      tag: latest
+    name: k8s-example-supervised-learning-flow
+    port: 3030
+  - dagsterApiGrpcArgs:
+    - --python-file
+    - /app/sorting_searching_flow.py
+    image:
+      pullPolicy: Always
+      repository: vietlong1220/sorting_searching_flow
+      tag: latest
+    name: k8s-example-sorting-searching-flow
+    port: 3030
+  - affinity: {}
+    annotations: {}
+    dagsterApiGrpcArgs:
+    - --python-file
+    - /app/clustering_flow.py
+    deploymentStrategy: {}
+    env: []
+    envConfigMaps: []
+    envSecrets: []
+    image:
+      pullPolicy: Always
+      repository: vietlong1220/clustering_flow
+      tag: latest
+    includeConfigInLaunchedRuns:
+      enabled: true
+    initContainers: []
+    labels: {}
+    livenessProbe: {}
+    name: k8s-example-clustering-flow
+    nodeSelector: {}
+    podSecurityContext: {}
+    port: 3030
+    readinessProbe:
+      enabled: true
+      failureThreshold: 1
+      periodSeconds: 20
+      successThreshold: 1
+      timeoutSeconds: 10
+    resources: {}
+    securityContext: {}
+    service:
+      annotations: {}
+    sidecarContainers: []
+    startupProbe:
+      enabled: false
+    tolerations: []
+    volumeMounts: []
+    volumes: []
+  enableSubchart: true
+  enabled: true
+  extraManifests: []
+  global:
+    celeryConfigSecretName: dagster-celery-config-secret
+    dagsterHome: /opt/dagster/dagster_home
+    postgresqlSecretName: dagster-postgresql-secret
+    serviceAccountName: ""
+  imagePullSecrets: []
+  postgresqlSecretName: dagster-postgresql-secret
+  rbacEnabled: true
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: ""
+dagsterDaemon:
+  affinity: {}
+  annotations: {}
+  checkDbReadyInitContainer: true
+  deploymentLabels: {}
+  enabled: true
+  env: []
+  envConfigMaps: []
+  envSecrets: []
+  extraContainers: []
+  extraPrependedInitContainers: []
+  heartbeatTolerance: 1800
+  image:
+    pullPolicy: Always
+    repository: docker.io/dagster/dagster-celery-k8s
+  initContainerResources: {}
+  labels: {}
+  livenessProbe: {}
+  nodeSelector: {}
+  podSecurityContext: {}
+  readinessProbe: {}
+  resources: {}
+  runCoordinator:
+    config:
+      queuedRunCoordinator:
+        dequeueNumWorkers: 4
+        dequeueUseThreads: true
+        tagConcurrencyLimits: []
+    enabled: true
+    type: QueuedRunCoordinator
+  runMonitoring:
+    enabled: true
+    freeSlotsAfterRunEndSeconds: 0
+    maxResumeRunAttempts: 0
+    pollIntervalSeconds: 120
+    startTimeoutSeconds: 300
+  runRetries:
+    enabled: true
+    maxRetries: 0
+  schedules:
+    numWorkers: 4
+    useThreads: true
+  securityContext: {}
+  sensors:
+    numWorkers: 4
+    useThreads: true
+  startupProbe: {}
+  tolerations: []
+  volumeMounts: []
+  volumes: []
+dagsterWebserver:
+  affinity: {}
+  annotations: {}
+  checkDbReadyInitContainer: true
+  deploymentLabels: {}
+  enableReadOnly: false
+  env: []
+  envConfigMaps: []
+  envSecrets: []
+  extraContainers: []
+  extraPrependedInitContainers: []
+  image:
+    pullPolicy: Always
+    repository: docker.io/dagster/dagster-celery-k8s
+  initContainerResources: {}
+  labels: {}
+  livenessProbe: {}
+  nameOverride: dagster-webserver
+  nodeSelector: {}
+  podSecurityContext: {}
+  readinessProbe:
+    failureThreshold: 3
+    httpGet:
+      path: /server_info
+      port: 80
+    periodSeconds: 20
+    successThreshold: 1
+    timeoutSeconds: 10
+  replicaCount: 1
+  resources: {}
+  securityContext: {}
+  service:
+    annotations: {}
+    port: 80
+    type: ClusterIP
+  startupProbe:
+    enabled: false
+  tolerations: []
+  volumeMounts: []
+  volumes: []
+  workspace:
+    enabled: false
+    servers:
+    - host: k8s-example-user-code-1
+      name: user-code-example
+      port: 3030
+flower:
+  affinity: {}
+  annotations: {}
+  checkDbReadyInitContainer: true
+  enabled: false
+  image:
+    pullPolicy: Always
+    repository: docker.io/mher/flower
+    tag: 0.9.5
+  livenessProbe:
+    failureThreshold: 3
+    periodSeconds: 20
+    tcpSocket:
+      port: flower
+  nodeSelector: {}
+  podSecurityContext: {}
+  resources: {}
+  securityContext: {}
+  service:
+    annotations: {}
+    port: 5555
+    type: ClusterIP
+  startupProbe:
+    failureThreshold: 6
+    periodSeconds: 10
+    tcpSocket:
+      port: flower
+  tolerations: []
+fullnameOverride: ""
+generateCeleryConfigSecret: true
+generatePostgresqlPasswordSecret: true
+global:
+  celeryConfigSecretName: dagster-celery-config-secret
+  dagsterHome: /opt/dagster/dagster_home
+  postgresqlSecretName: dagster-postgresql-secret
+  serviceAccountName: ""
+  storageClass: local-path
+imagePullSecrets: []
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  dagsterWebserver:
+    host: dagster.longks.local
+    path: /
+    pathType: Prefix
+    precedingPaths: []
+    succeedingPaths: []
+    tls:
+      enabled: false
+      secretName: ""
+  enabled: true
+  flower:
+    host: ""
+    path: ""
+    pathType: ImplementationSpecific
+    precedingPaths: []
+    succeedingPaths: []
+    tls:
+      enabled: false
+      secretName: ""
+  ingressClassName: nginx
+  labels: {}
+  readOnlyDagsterWebserver:
+    host: dagster-readonly.longks.local
+    path: /
+    pathType: Prefix
+    precedingPaths: []
+    succeedingPaths: []
+    tls:
+      enabled: false
+      secretName: ""
+migrate:
+  enabled: false
+  extraContainers: []
+  initContainers: []
+nameOverride: ""
+pipelineRun:
+  env: {}
+  image:
+    pullPolicy: Always
+    repository: vietlong1220/dagster-pipeline:latest
+postgresql:
+  enabled: true
+  extraEnv: []
+  global:
+    celeryConfigSecretName: dagster-celery-config-secret
+    dagsterHome: /opt/dagster/dagster_home
+    postgresql: {}
+    postgresqlSecretName: dagster-postgresql-secret
+    serviceAccountName: ""
+  image:
+    debug: false
+    pullPolicy: IfNotPresent
+    registry: docker.io
+    repository: library/postgres
+    tag: "14.6"
+  ldap:
+    baseDN: ""
+    bind_password: null
+    bindDN: ""
+    enabled: false
+    port: ""
+    prefix: ""
+    scheme: ""
+    search_attr: ""
+    search_filter: ""
+    server: ""
+    suffix: ""
+    tls: false
+    url: ""
+  livenessProbe:
+    enabled: true
+    failureThreshold: 6
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  master:
+    affinity: {}
+    annotations: {}
+    extraInitContainers: ""
+    extraVolumeMounts: []
+    extraVolumes: []
+    labels: {}
+    nodeSelector: {}
+    podAnnotations: {}
+    podLabels: {}
+    priorityClassName: ""
+    tolerations: []
+  metrics:
+    enabled: false
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: bitnami/postgres-exporter
+      tag: 0.7.0-debian-9-r12
+    livenessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    prometheusRule:
+      additionalLabels: {}
+      enabled: false
+      namespace: ""
+      rules: []
+    readinessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    securityContext:
+      enabled: false
+      runAsUser: 1001
+    service:
+      annotations:
+        prometheus.io/port: "9187"
+        prometheus.io/scrape: "true"
+      loadBalancerIP: null
+      type: ClusterIP
+    serviceMonitor:
+      additionalLabels: {}
+      enabled: false
+  networkPolicy:
+    allowExternal: true
+    enabled: false
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    annotations: {}
+    enabled: true
+    mountPath: /bitnami/postgresql
+    size: 8Gi
+    subPath: ""
+  postgresqlDataDir: /bitnami/postgresql/data
+  postgresqlDatabase: test
+  postgresqlHost: ""
+  postgresqlParams: {}
+  postgresqlPassword: test
+  postgresqlScheme: ""
+  postgresqlUsername: test
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+  readinessProbe:
+    enabled: true
+    failureThreshold: 6
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  replication:
+    applicationName: my_application
+    enabled: false
+    numSynchronousReplicas: 0
+    password: repl_password
+    slaveReplicas: 1
+    synchronousCommit: "off"
+    user: repl_user
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  securityContext:
+    enabled: true
+    fsGroup: 1001
+    runAsUser: 1001
+  service:
+    annotations: {}
+    port: 5432
+    type: ClusterIP
+  serviceAccount:
+    enabled: false
+  shmVolume:
+    enabled: true
+  slave:
+    affinity: {}
+    annotations: {}
+    extraInitContainers: ""
+    extraVolumeMounts: []
+    extraVolumes: []
+    labels: {}
+    nodeSelector: {}
+    podAnnotations: {}
+    podLabels: {}
+    priorityClassName: ""
+    tolerations: []
+  updateStrategy:
+    type: RollingUpdate
+  volumePermissions:
+    enabled: true
+    image:
+      pullPolicy: Always
+      registry: docker.io
+      repository: bitnami/minideb
+      tag: stretch
+    securityContext:
+      runAsUser: 0
+pythonLogs: {}
+rabbitmq:
+  enabled: false
+  image:
+    pullPolicy: IfNotPresent
+    repository: bitnami/rabbitmq
+    tag: 3.8.12
+  rabbitmq:
+    password: test
+    username: test
+  service:
+    port: 5672
+  volumePermissions:
+    enabled: true
+    image:
+      pullPolicy: IfNotPresent
+      repository: bitnami/minideb
+      tag: stretch
+rbacEnabled: true
+redis:
+  backendDbNumber: 0
+  backendUrl: ""
+  brokerDbNumber: 0
+  brokerUrl: ""
+  enabled: false
+  host: ""
+  internal: false
+  password: test
+  port: 6379
+  usePassword: false
+retention:
+  autoMaterialize:
+    purgeAfterDays:
+      failure: -1
+      skipped: 7
+      started: -1
+      success: -1
+  enabled: false
+  schedule:
+    purgeAfterDays: -1
+  sensor:
+    purgeAfterDays:
+      failure: -1
+      skipped: 7
+      started: -1
+      success: -1
+runLauncher:
+  config:
+    celeryK8sRunLauncher:
+      affinity: {}
+      annotations: {}
+      checkDbReadyInitContainer: true
+      configSource: {}
+      env: {}
+      envConfigMaps: []
+      envSecrets: []
+      failPodOnRunFailure: false
+      image:
+        pullPolicy: Always
+        repository: docker.io/dagster/dagster-celery-k8s
+      imagePullPolicy: Always
+      labels: {}
+      livenessProbe:
+        failureThreshold: 3
+        initialDelaySeconds: 15
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 10
+      nameOverride: celery-workers
+      nodeSelector: {}
+      podSecurityContext: {}
+      resources: {}
+      securityContext: {}
+      tolerations: []
+      volumeMounts: []
+      volumes: []
+      workerQueues:
+      - additionalCeleryArgs: []
+        configSource: {}
+        labels: {}
+        name: dagster
+        nodeSelector: {}
+        replicaCount: 2
+    k8sRunLauncher:
+      envConfigMaps: []
+      envSecrets: []
+      envVars: []
+      failPodOnRunFailure: false
+      imagePullPolicy: Always
+      labels: {}
+      loadInclusterConfig: true
+      resources: {}
+      runK8sConfig: {}
+      volumeMounts: []
+      volumes: []
+  type: K8sRunLauncher
+scheduler:
+  config: {}
+  type: DagsterDaemonScheduler
+serviceAccount:
+  annotations: {}
+  create: true
+  name: ""
+telemetry:
+  enabled: true

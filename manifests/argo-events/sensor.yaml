@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: gitlab-mlops-sensor
+  namespace: argo
+spec:
+  eventBusName: mlops
+  dependencies:
+    - name: gitlab-dep
+      eventSourceName: gitlab
+      eventName: example
+  triggers:
+    - template:
+        name: argo-workflow-trigger
+        argoWorkflow:
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: gitlab-triggered-
+              spec:
+                entrypoint: whalesay
+                templates:
+                  - name: whalesay
+                    container:
+                      image: docker/whalesay
+                      command: ["cowsay"]
+                      args: ["Hello from GitLab!"]

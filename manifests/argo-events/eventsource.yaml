@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: gitlab
+  namespace: argo
+spec:
+  eventBusName: mlops
+  service:
+    ports:
+      - port: 12000
+        targetPort: 12000
+  gitlab:
+    example:
+      projectId: "1"                   # GitLab project ID
+      webhook:
+        endpoint: /mlops
+        port: "12000"
+        method: POST
+      events:
+        - PushEvents
+      accessToken:
+        name: gitlab-access
+        key: token
+      gitlabBaseURL: "https://gitlab.longks.com"
