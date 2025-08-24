@@ -21,10 +21,5 @@ spec:
               metadata:
                 generateName: gitlab-triggered-
               spec:
-                entrypoint: whalesay
-                templates:
-                  - name: whalesay
-                    container:
-                      image: docker/whalesay
-                      command: ["cowsay"]
-                      args: ["Hello from GitLab!"]
+                workflowTemplateRef:
+                  name: mlops-workflow-template

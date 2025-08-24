@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: mlops-workflow-template
+  namespace: argo
+spec:
+  entrypoint: mlops-pipeline
+  templates:
+    - name: mlops-pipeline
+      steps:
+        - - name: whalesay-step
+            template: whalesay
+    - name: whalesay
+      container:
+        image: docker/whalesay
+        command: ["cowsay"]
+        args: ["Hello from MLOps Pipeline triggered by GitLab!"]
