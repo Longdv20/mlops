@@ -107,6 +107,7 @@ spec:
         name: workspace
       spec:
         accessModes: ["ReadWriteOnce"]
+        storageClassName: argo-workflows-local-path
         resources:
           requests:
             storage: 1Gi
