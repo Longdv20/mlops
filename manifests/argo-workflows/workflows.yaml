@@ -5,13 +5,113 @@ metadata:
   namespace: argo
 spec:
   entrypoint: mlops-pipeline
+  arguments:
+    parameters:
+      - name: repo-url
+        description: "GitLab repository URL to clone"
+      - name: image-name
+        description: "Docker image name for building and pushing"
   templates:
     - name: mlops-pipeline
+      inputs:
+        parameters:
+          - name: repo-url
+          - name: image-name
       steps:
-        - - name: whalesay-step
-            template: whalesay
-    - name: whalesay
+        - - name: git-clone-step
+            template: git-clone
+            arguments:
+              parameters:
+                - name: repo-url
+                  value: "{{inputs.parameters.repo-url}}"
+        - - name: docker-build-step
+            template: docker-build
+            arguments:
+              parameters:
+                - name: image-name
+                  value: "{{inputs.parameters.image-name}}"
+        - - name: docker-push-step
+            template: docker-push
+            arguments:
+              parameters:
+                - name: image-name
+                  value: "{{inputs.parameters.image-name}}"
+    
+    - name: git-clone
+      inputs:
+        parameters:
+          - name: repo-url
       container:
-        image: docker/whalesay
-        command: ["cowsay"]
-        args: ["Hello from MLOps Pipeline triggered by GitLab!"]
+        image: alpine/git:latest
+        command: [sh, -c]
+        args: 
+          - |
+            echo "Cloning repository: {{inputs.parameters.repo-url}}"
+            git clone {{inputs.parameters.repo-url}} /workspace/source
+            cd /workspace/source
+            ls -la
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+        workingDir: /workspace
+
+    - name: docker-build
+      inputs:
+        parameters:
+          - name: image-name
+      container:
+        image: docker:latest
+        command: [sh, -c]
+        args:
+          - |
+            echo "Building Docker image: vietlong1220/{{inputs.parameters.image-name}}:latest"
+            cd /workspace/source
+            if [ ! -f Dockerfile ]; then
+              echo "Creating default Dockerfile..."
+              cat > Dockerfile << 'EOF'
+            FROM alpine:latest
+            WORKDIR /app
+            COPY . .
+            CMD ["echo", "MLOps application deployed successfully"]
+            EOF
+            fi
+            docker build -t vietlong1220/{{inputs.parameters.image-name}}:latest .
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+          - name: docker-sock
+            mountPath: /var/run/docker.sock
+        workingDir: /workspace/source
+
+    - name: docker-push
+      inputs:
+        parameters:
+          - name: image-name
+      container:
+        image: docker:latest
+        command: [sh, -c]
+        args:
+          - |
+            echo "Pushing Docker image: vietlong1220/{{inputs.parameters.image-name}}:latest"
+            # Docker login should be configured via secrets or service account
+            # For now, we'll just echo the push command
+            echo "docker push vietlong1220/{{inputs.parameters.image-name}}:latest"
+            # Uncomment the following line when Docker registry credentials are configured:
+            # docker push vietlong1220/{{inputs.parameters.image-name}}:latest
+        volumeMounts:
+          - name: docker-sock
+            mountPath: /var/run/docker.sock
+
+  volumeClaimTemplates:
+    - metadata:
+        name: workspace
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+  
+  volumes:
+    - name: docker-sock
+      hostPath:
+        path: /var/run/docker.sock

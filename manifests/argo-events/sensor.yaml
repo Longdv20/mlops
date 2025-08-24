@@ -23,3 +23,18 @@ spec:
               spec:
                 workflowTemplateRef:
                   name: mlops-workflow-template
+                arguments:
+                  parameters:
+                    - name: repo-url
+                      value: ""
+                    - name: image-name
+                      value: ""
+          parameters:
+            - src:
+                dependencyName: gitlab-dep
+                dataKey: body.repository.git_http_url
+              dest: spec.arguments.parameters.0.value
+            - src:
+                dependencyName: gitlab-dep
+                dataKey: body.repository.name
+              dest: spec.arguments.parameters.1.value
