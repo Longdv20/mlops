@@ -5,7 +5,7 @@ metadata:
   name: argo-workflow-rolebinding
 subjects:
 - kind: ServiceAccount
-  name: default         # << your sensor is using argo:default
+  name: argo-workflows-sa
   namespace: argo
 roleRef:
   kind: Role

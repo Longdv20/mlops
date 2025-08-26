@@ -5,5 +5,5 @@ metadata:
   name: argo-workflow-role
 rules:
 - apiGroups: ["argoproj.io"]
-  resources: ["workflows"]
+  resources: ["workflows", "workflowtaskresults"]
   verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]

@@ -5,6 +5,8 @@ metadata:
   namespace: argo
 spec:
   eventBusName: mlops
+  template:
+    serviceAccountName: argo-workflows-sa
   dependencies:
     - name: gitlab-dep
       eventSourceName: gitlab
@@ -21,20 +23,19 @@ spec:
               metadata:
                 generateName: gitlab-triggered-
               spec:
+                serviceAccountName: argo-workflows-sa
                 workflowTemplateRef:
                   name: mlops-workflow-template
                 arguments:
                   parameters:
-                    - name: repo-url
-                      value: ""
-                    - name: image-name
-                      value: ""
+                    - name: user-name
+                    - name: repo-name
+
           parameters:
             - src:
                 dependencyName: gitlab-dep
-                dataKey: body.repository.git_http_url
+                dataKey: body.user_username
               dest: spec.arguments.parameters.0.value
             - src:
                 dependencyName: gitlab-dep
                 dataKey: body.repository.name
-              dest: spec.arguments.parameters.1.value
